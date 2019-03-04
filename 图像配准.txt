@@ -1,0 +1,79 @@
+#include<opencv2/opencv.hpp>
+#include<opencv2/highgui/highgui.hpp>
+#include<math.h>
+#include<stdio.h>
+#include<iostream>
+#include<vector>
+using namespace cv;
+using namespace std;
+
+Mat src1, src2;
+Point curpoint = Point(-1, -1);
+vector<Point>points1;
+vector<Point>points2;
+void onmouse1(int event, int x, int y, int flags, void*ustc)
+{
+	if (event == CV_EVENT_LBUTTONDOWN)
+	{
+		curpoint = Point(x, y);
+		points1.push_back(curpoint);
+		circle(src1, curpoint, 10, Scalar(255, 0, 0), CV_FILLED);
+		waitKey(5);
+		imshow("src1", src1);
+	}
+}
+
+void onmouse2(int event, int x, int y, int flags, void*ustc)
+{
+	if (event == CV_EVENT_LBUTTONDOWN)
+	{
+		curpoint = Point(x, y);
+		points2.push_back(curpoint);
+		circle(src2, curpoint, 10, Scalar(255, 0, 0), CV_FILLED);
+		waitKey(5);
+		imshow("src2", src2);
+	}
+}
+
+int main()
+{
+	src1 = imread("E:\\¿Î¼þ\\Í¼Ïñ\\Í¼ÏñÅä×¼\\Image A.jpg");
+	Mat copy1 = src1.clone();
+	cvNamedWindow("src1",0);
+	setMouseCallback("src1", onmouse1, 0);
+	imshow("src1", src1);
+	waitKey(0);
+	imwrite("E:\\¿Î¼þ\\Í¼Ïñ\\Í¼ÏñÅä×¼\\Image APoint.jpg",src1);
+	src2 = imread("E:\\¿Î¼þ\\Í¼Ïñ\\Í¼ÏñÅä×¼\\Image B.jpg");
+	Mat copy2 = src2.clone();
+	cvNamedWindow("src2", 0);
+	setMouseCallback("src2", onmouse2, 0);
+	imshow("src2", src2);
+	waitKey(0);
+	imwrite("E:\\¿Î¼þ\\Í¼Ïñ\\Í¼ÏñÅä×¼\\Image BPoint.jpg", src2);
+	Mat h=findHomography(points2, points1);
+	Mat trans;
+	warpPerspective(copy2, trans, h, copy1.size());
+	cvNamedWindow("trans", 0);
+	imshow("trans", trans);
+	for (int i = 0; i < h.rows; i++)
+	{
+		for (int j = 0; j < h.cols; j++)
+		{
+			cout << h.at<double>(i, j) << ' ';
+		}
+		cout << '\n';
+	}
+	for (int i = 0; i < points1.size(); i++)
+	{
+		cout << points1[i].y << ' ' << points1[i].x << '\n';
+	}
+
+	for (int i = 0; i < points1.size(); i++)
+	{
+		cout << points2[i].y << ' ' << points2[i].x << '\n';
+	}
+	imwrite("E:\\¿Î¼þ\\Í¼Ïñ\\Í¼ÏñÅä×¼\\trans.jpg", trans);
+	waitKey(0);
+	return 0;
+}
